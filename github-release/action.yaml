@@ -3,6 +3,9 @@ name: 'github-release'
 description: 'Creates a GitHub release corresponding to the given tag.'
 
 inputs:
+  binary-contents:
+    description: 'A binary artefact to upload as part of the release. (Omit this to create an empty release.)'
+    required: false
   tag:
     description: |
       The tag name to which the GitHub release will correspond. This is used as the release name.
@@ -43,4 +46,5 @@ runs:
         TAG: ${{ inputs.tag }}
         GITHUB_TOKEN: "${{ inputs.github-token }}"
         TARGET_COMMITISH: "${{ inputs.target-commitish }}"
+        BINARY_CONTENTS: "${{ inputs.binary-contents }}"
       run: '$GITHUB_ACTION_PATH/github-release.sh'

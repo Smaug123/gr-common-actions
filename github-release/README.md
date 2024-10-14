@@ -25,6 +25,7 @@ github-release:
         generate-release-notes: true
         draft: true
         prerelease: true
+        binary-contents: path/to/binary
 ```
 
 # Inputs
@@ -64,6 +65,10 @@ Set to `true` to mark this GitHub release as a prerelease.
 Boolean.
 Enables [generated release notes](https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes) on the GitHub release.
 If you set this, you must also set `target-commitish` (even if the `tag` already exists), though GitHub does not appear to document this fact.
+
+## `binary-contents`
+
+A path to some binary data to upload to the release as a release asset.
 
 # Why?
 
