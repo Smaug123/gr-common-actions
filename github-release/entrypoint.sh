@@ -61,10 +61,12 @@ if echo "$BINARY_CONTENTS" | jq --exit-status '.[]' >/dev/null 2>&1 ; then
     echo "$BINARY_CONTENTS" | jq --raw-output0 '.[]' | while IFS= read -r -d $'\0' filepath; do
         release "$filepath"
     done
-else
+elif [ -n "$BINARY_CONTENTS" ] ; then
     # Not JSON. Treat as a newline-delimited list of filepaths.
     # If the user wants to pass a newline in one of the paths, they must use JSON.
     echo "$BINARY_CONTENTS" | while IFS= read -r filepath; do
-        release "$filepath"
+        if [ -n "$filepath" ] ; then
+          release "$filepath"
+        fi
     done
 fi
