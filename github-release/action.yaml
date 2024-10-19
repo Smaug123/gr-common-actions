@@ -4,7 +4,7 @@ description: 'Creates a GitHub release corresponding to the given tag.'
 
 inputs:
   binary-contents:
-    description: 'A binary artefact to upload as part of the release. (Omit this to create an empty release.)'
+    description: 'Binary artefact(s) to upload as part of the release. (Omit this to create an empty release, or use a multi-line string to upload multiple artefacts at once; see the README for details if your paths contain newlines.)'
     required: false
   tag:
     description: |
