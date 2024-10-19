@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 DRAFT=${DRAFT:-false}
 PRERELEASE=${PRERELEASE:-false}
@@ -40,10 +40,10 @@ if [ "$DRY_RUN" != 1 ] ; then
     fi
 fi
 
-# Upload the binary, if specified
+# Upload the binary, if specified.
 
-if [ -n "$BINARY_CONTENTS" ] ; then
-    RELEASE_NAME="$(basename "$BINARY_CONTENTS")"
+release() {
+    RELEASE_NAME="$(basename "$1")"
     CURL_URL="https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets?name=$RELEASE_NAME"
     echo "Posting binary contents to $CURL_URL"
 
@@ -53,5 +53,18 @@ if [ -n "$BINARY_CONTENTS" ] ; then
         -H "X-GitHub-Api-Version: 2022-11-28" \
         -H "Content-Type: application/octet-stream" \
         "$CURL_URL" \
-        --data-binary "@$BINARY_CONTENTS"
+        --data-binary "@$1"
+}
+
+if echo "$BINARY_CONTENTS" | jq --exit-status '.[]' >/dev/null 2>&1 ; then
+    # This is JSON. Assert that it's a list, and iterate over the list; treat each element as a filepath.
+    echo "$BINARY_CONTENTS" | jq --raw-output0 '.[]' | while IFS= read -r -d $'\0' filepath; do
+        release "$filepath"
+    done
+else
+    # Not JSON. Treat as a newline-delimited list of filepaths.
+    # If the user wants to pass a newline in one of the paths, they must use JSON.
+    echo "$BINARY_CONTENTS" | while IFS= read -r filepath; do
+        release "$filepath"
+    done
 fi

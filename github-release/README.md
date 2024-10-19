@@ -25,8 +25,16 @@ github-release:
         generate-release-notes: true
         draft: true
         prerelease: true
-        binary-contents: path/to/binary
+        binary-contents: |
+          path/to/binary1
+          path/to/binary2
 ```
+
+# Why?
+
+GitHub releasing is an operation which is intended to happen in a privileged context.
+It's very simple to do using the GitHub API, but GitHub appear not to offer a first-party action to do it.
+We prefer to keep our dependency footprints small in privileged contexts; so we simply make the necessary API calls manually.
 
 # Inputs
 
@@ -39,7 +47,7 @@ If this doesn't exist at the time this step runs, the tag is created to point to
 
 ## `github-token`
 
-A GitHub token with at least `contents: "write"` perms, and optionally also `actions: "write"` (though GitHub does not document the conditions under which this is required).
+A GitHub token with at least `contents: "write"` perms; also optionall `actions: "write"` (GitHub does not appear to document the conditions under which this is required; we believe it's when you want this step to run correctly on pull requests which edit a `.github/` workflow file).
 This should usually be `github-token: ${{ secrets.GITHUB_TOKEN }}`, and you need to remember the appropriate `permissions` block in the job config.
 
 ## `target-commitish`
@@ -68,10 +76,32 @@ If you set this, you must also set `target-commitish` (even if the `tag` already
 
 ## `binary-contents`
 
-A path to some binary data to upload to the release as a release asset.
+Paths to some binary data to upload to the release as release assets.
 
-# Why?
+The simpler (but less flexible) way to pass inputs here is as a single string (if you want to upload only one asset):
 
-GitHub releasing is an operation which is intended to happen in a privileged context.
-It's very simple to do using the GitHub API, but GitHub appear not to offer a first-party action to do it.
-We prefer to keep our dependency footprints small in privileged contexts; so we simply make the necessary API calls manually.
+```yaml
+with:
+  binary-contents: foo
+```
+
+or as a newline-delimited string list:
+
+```yaml
+with:
+  binary-contents: |
+    foo
+    bar
+    baz
+```
+
+However, you may instead use the canonical input format, a string containing a JSON array of filepaths.
+(You *must* use this format if any of your paths contain newlines, or if they are themselves certain kinds of valid JSON string.)
+This eccentric input method is because [GitHub Actions doesn't support lists](https://github.com/actions/toolkit/issues/184).
+
+```yaml
+with:
+  binary-contents: "[\"hello\nworld.txt\",\"foo.txt\"]"
+```
+
+(We wish you the best of luck constructing this string. YAML is hard for humans to read or write; use [an interactive renderer](https://yaml-online-parser.appspot.com/).)
