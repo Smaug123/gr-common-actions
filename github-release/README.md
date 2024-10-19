@@ -79,6 +79,9 @@ If you set this, you must also set `target-commitish` (even if the `tag` already
 Paths to some binary data to upload to the release as release assets.
 These paths are relative to the workspace; because the action runs in a Docker container, you cannot e.g. write data to `/tmp` in an earlier step and then release it from there.
 
+Note that GitHub silently rewrites release asset filenames so that they are not a bare `.extension`.
+For example, if you tried to release the file `.gitignore`, it would be released under the name `default.gitignore`.
+
 The simpler (but less flexible) way to pass inputs here is as a single string (if you want to upload only one asset):
 
 ```yaml
